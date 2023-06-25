@@ -3,7 +3,6 @@ import telebot
 from background import keep_alive
 import os, json
 from gpt import GPT
-from concurrent.futures import ThreadPoolExecutor
 import asyncio
 from deep_translator import GoogleTranslator
 
