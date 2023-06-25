@@ -32,3 +32,5 @@ And, of course, you can deploy and run this project on your local machine.
 - Run command `pip install -r requirements.txt`.
 - Create virtual environment variable with your telegram bot token `token="your_telegram_bot_token"`.
 - For starting bot use command `python3 main.py`.
+
+**Have a good day 😉**
