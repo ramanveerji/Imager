@@ -1,4 +1,4 @@
-from imaginepy import Imagine, Style, Ratio
+from imaginepy import AsyncImagine, Style, Ratio
 import telebot
 from background import keep_alive
 import os, json
@@ -41,17 +41,20 @@ def generate_image(message):
   prompt = message.text
   user_language = message.from_user.language_code
 
-  imagine = Imagine()
-
   ratio_mapping = {
     "1x1": Ratio.RATIO_1X1,
     "9x16": Ratio.RATIO_9X16,
     "16x9": Ratio.RATIO_16X9,
     "4x3": Ratio.RATIO_4X3,
-    "3x2": Ratio.RATIO_3X2
+    "3x2": Ratio.RATIO_3X2,
+    "2x3": Ratio.RATIO_2X3,
+    "5x4": Ratio.RATIO_5X4,
+    "4x5": Ratio.RATIO_4X5,
+    "3x1": Ratio.RATIO_3X1,
+    "3x4": Ratio.RATIO_3X4
   }
 
-  def generate_image_sync():
+  async def generate_image_sync():
     img_data = None
     bot.send_message(
       message.chat.id,
@@ -77,11 +80,13 @@ def generate_image(message):
             "Error with image ratio. Available ratios: 1x1, 16x9, 9x16, 4x3, 3x2",
             user_language))
         return
-      img_data = imagine.sdprem(prompt=gpt_prompt,
+      imagine = AsyncImagine(style=eval(f"""Style.{type}"""))
+      img_data = await imagine.sdprem(prompt=gpt_prompt,
                                 style=eval(f"""Style.{type}"""),
                                 ratio=ratio_mapping[image_size])
     except:
-      img_data = imagine.sdprem(prompt=gpt_prompt,
+      imagine = AsyncImagine(style=Style.ANIME_V2)
+      img_data = await imagine.sdprem(prompt=gpt_prompt,
                                 style=Style.ANIME_V2,
                                 ratio=ratio_mapping[image_size])
 
@@ -92,7 +97,7 @@ def generate_image(message):
                           user_language))
       return
 
-    img_data = imagine.upscale(image=img_data)
+    img_data = await imagine.upscale(image=img_data)
 
     if img_data is None:
       bot.send_message(
@@ -100,6 +105,8 @@ def generate_image(message):
         translate_message("An error occurred while upscaling the image.",
                           user_language))
       return
+    
+    await imagine.close()
 
     try:
       bot.send_photo(message.chat.id, photo=img_data)
@@ -109,21 +116,8 @@ def generate_image(message):
         message.chat.id,
         translate_message("An error occurred while sending the image.",
                           user_language))
-
-  async def add_username_to_file():
-    with open("users.txt", "r") as file:
-      usernames = file.read().splitlines()
-
-    username = message.from_user.username
-    if username not in usernames:
-      usernames.append(username)
-      with open("users.txt", "a") as file:
-        file.write(str(username) + "\n")
-
-  with ThreadPoolExecutor() as executor:
-    executor.submit(generate_image_sync)
-
-  asyncio.run(add_username_to_file())
+  
+  asyncio.run(generate_image_sync())
 
 
 # Запускаємо бота

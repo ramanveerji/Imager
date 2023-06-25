@@ -4,3 +4,4 @@ langdetect
 deep-translator
 pyTelegramBotAPI
 flask
+aiohttp
