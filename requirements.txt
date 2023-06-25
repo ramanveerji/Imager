@@ -1,0 +1,6 @@
+requests
+requests_toolbelt
+langdetect
+deep-translator
+pyTelegramBotAPI
+flask
