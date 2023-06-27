@@ -16,8 +16,7 @@ llm = GPT()
 def translate_message(message, target_language):
   try:
     translator = GoogleTranslator(source='auto', target=target_language)
-    translated_message = translator.translate(message)
-    return translated_message
+    return translator.translate(message)
   except Exception as e:
     print(e)
     return message
